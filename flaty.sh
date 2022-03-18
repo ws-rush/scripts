@@ -41,7 +41,7 @@ case $CHOICE in
 		FROM=$(zenity --file-selection --title="select Flaty file" --filename "${HOME}/" --file-filter="*.tar.gz") || read -p "enter the path of flaty file: " FROM
 		rm -rf ~/.local/share/flatpak && \
 		# TODO: add real progress for zenity and tar command
-		[ -z `command -v zenity` ] && tar -xzvf $FROM -C ~/.local/share || tar -xzvf $FROM -C ~/.local/share | zenity --progress --auto-close
+		[ -z `command -v zenity` ] && tar -xzvf "$FROM" -C ~/.local/share || tar -xzvf "$FROM" -C ~/.local/share | zenity --progress --auto-close
 		[ `echo $?` == 0 ] && zenity --info --text="Place Flaty complete."; exit 0
 		zenity --error --text="An error has ocurred, check space."
 		;;
