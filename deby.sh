@@ -30,7 +30,9 @@ else
 fi
 
 ## calculate available space in desk
-AVAIL=$(( `df -BM --output=avail,target | grep -w / | awk '{print $1}' | awk '{ print substr( $0, 1, length($0)-1 ) }'` - ( $SIZE * 1024 )  ))
+if [ -v SIZE ]; then
+	AVAIL=$(( `df -BM --output=avail,target | grep -w / | awk '{print $1}' | awk '{ print substr( $0, 1, length($0)-1 ) }'` - ( $SIZE * 1024 )  ))
+fi
 
 ## add swap
 if [ -z "$SIZE" ]; then
