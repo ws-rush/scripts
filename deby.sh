@@ -3,7 +3,7 @@
 # Author: Rushied Qaied Alwusbay
 # Email: rush@wusaby.me
 # Version: 0.9
-# first config for debian installiation
+# first config for debian installiation (this is old script)
 
 # check of root privilages
 if [[ $EUID -ne 0 ]]; then
