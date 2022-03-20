@@ -11,6 +11,14 @@ if [ -z `command -v flatpak` ]; then
 	exit 1
 fi
 
+# check of root privilages
+if [[ $EUID -e 0 ]]; then
+	root_message="This script must not run as root"
+	[ -z `command -v zenity` ] && echo "$root_message" || zenity --error --width=400 --text="$root_message"
+	exit 2
+fi
+
+
 # TODO: use select rather than `read -p`
 # TODO: orgnize choice code in functions to back them after any process or as alias
 CHOICE=$(zenity --list --radiolist --column Selection --column Process --column Choice --print-column=3 --hide-column=3 --text="Which process you need" FALSE "Configure repos [need net]" 0 TRUE "Suck Flaty" 1 FALSE "Place Flaty" 2) || read -p $'Which proccess you need:\n0) Configure repos [need net]\n1) Suck Flaty\n2) Place Flaty\npress any key to exit\n' CHOICE
