@@ -112,15 +112,7 @@ Pin-Priority: 600" > /etc/apt/preferences.d/distro
 deb http://deb.debian.org/debian/ $KERNEL main contrib non-free
 deb http://deb.debian.org/debian/ $KERNEL-updates main contrib non-free" > /etc/apt/sources.list.d/kernel.list
 	echo "# kernel porefrences
-Package: linux-image-*
-Pin: release a=$KERNEL
-Pin-Priority: 950
-
-Package: linux-headers-*
-Pin: release a=$KERNEL
-Pin-Priority: 950
-
-Package: linux-libc-*
+Package: linux-*
 Pin: release a=$KERNEL
 Pin-Priority: 950" > /etc/apt/preferences.d/kernel
 
