@@ -49,6 +49,9 @@ else
 /swapfile swap swap defaults 0 0" >> /etc/fstab
 fi
 
+# reduce swappiness
+echo "vm.swappiness = 10" >> /etc/sysctl.conf
+
 ## execution message
 [ -z `command -v zenity` ] && echo "$swap_message" || zenity --info --width=400 --text="$swap_message"
 
