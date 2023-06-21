@@ -48,13 +48,13 @@ apps_cli () {
 	
 		"suck")
 			read -p "enter a path for apps file (where you want to extract): " DIR
-			cd ~
-			tar -czvf "$DIR"/Apps$(date +"%d%m%y%H%S")@$USER.tar.gz ".var"
+			cd ~/.var
+			tar -czvf "$DIR"/Apps$(date +"%d%m%y%H%S")@$USER.tar.gz app
 			;;
 
 		"place")
 			read -p "enter the path of apps file: " FROM
-			rm -rf ~/.var && tar -xzvf "$FROM" -C ~
+			rm -rf ~/.var/app && tar -xzvf "$FROM" -C ~/.var
 			;;
 
 		"*")
@@ -64,6 +64,35 @@ apps_cli () {
 }
 
 boxes_cli () {
+	# choose process
+	PS3='Choose a process for Boxes data:'
+	select CHOICE in suck place cancel
+	do
+	break
+	done
+	
+	# process choices
+	case $CHOICE in
+	
+		"suck")
+			read -p "enter a path for boxes file (where you want to extract): " DIR
+			cd ~/.var
+			tar -czvf "$DIR"/Boxes$(date +"%d%m%y%H%S")@$USER.tar.gz box
+			;;
+
+		"place")
+			read -p "enter the path of boxes file: " FROM
+			rm -rf ~/.var/box && tar -xzvf "$FROM" -C ~/.var
+			;;
+
+		"*")
+			exit 0
+			;;
+	esac	
+}
+
+# TODO: need redefine
+pods_cli () {
 	# choose process
 	PS3='Choose a process for Boxes:'
 	select CHOICE in suck place cancel
@@ -103,6 +132,7 @@ swiss_back_cli () {
 	flaty_cli
 	apps_cli
 	boxes_cli
+	pods_cli
 }
 
 ################## GUI
@@ -144,16 +174,44 @@ apps_gui () {
 		"1")
 			DIR=$(zenity  --file-selection --title="Choose a directory" --directory) || return 1
 			[ -z $DIR ] && exit 1
-			cd ~
+			cd ~/.var
 			# TODO: add real progress for zenity and tar command
-		    tar -czvf "$DIR"/Apps$(date +"%d%m%y%H%S")@$USER.tar.gz ".var" | zenity --progress --auto-close
+		    tar -czvf "$DIR"/Apps$(date +"%d%m%y%H%S")@$USER.tar.gz app | zenity --progress --auto-close
 			[ `echo $?` == 0 ] && zenity --info --text="Suck Apps complete." || zenity --error --text="An error has ocurred, check space."
 			;;
 
 		"2")
 			FROM=$(zenity --file-selection --title="select Apps file" --filename "${HOME}/" --file-filter="Apps*.tar.gz") || return 1
-			rm -rf ~/.var && tar -xzvf "$FROM" -C ~ | zenity --progress --auto-close
+			rm -rf ~/.var/app && tar -xzvf "$FROM" -C ~/.var | zenity --progress --auto-close
 			[ `echo $?` == 0 ] && zenity --info --text="Place Apps complete." || zenity --error --text="An error has ocurred, check space."
+			;;
+
+		"*")
+			exit 0
+			;;
+	esac	
+}
+
+boxes_gui () {
+	# choose process
+	CHOICE=$(zenity --list --radiolist --column Selection --column Process --column Choice --print-column=3 --hide-column=3 --text="Choose a process for Boxes data" FALSE "suck" 1 TRUE "place" 2 FALSE "cancel" 3)
+
+	# process choices
+	case $CHOICE in
+
+		"1")
+			DIR=$(zenity  --file-selection --title="Choose a directory" --directory) || return 1
+			[ -z $DIR ] && exit 1
+			cd ~/.var
+			# TODO: add real progress for zenity and tar command
+		    tar -czvf "$DIR"/Boxes$(date +"%d%m%y%H%S")@$USER.tar.gz box | zenity --progress --auto-close
+			[ `echo $?` == 0 ] && zenity --info --text="Suck Boxes complete." || zenity --error --text="An error has ocurred, check space."
+			;;
+
+		"2")
+			FROM=$(zenity --file-selection --title="select Boxes file" --filename "${HOME}/" --file-filter="Boxes*.tar.gz") || return 1
+			rm -rf ~/.var/box && tar -xzvf "$FROM" -C ~/.var | zenity --progress --auto-close
+			[ `echo $?` == 0 ] && zenity --info --text="Place Boxes complete." || zenity --error --text="An error has ocurred, check space."
 			;;
 
 		"*")
@@ -199,6 +257,7 @@ swiss_back_gui () {
 	# main
 	flaty_gui
 	apps_gui
+	boxes_gui
 	pods_gui
 }
 
