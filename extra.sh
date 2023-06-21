@@ -17,3 +17,16 @@ fi
 # limit users 
 # usermod -L --expiredate 2022-09-21 user
 # usermod -U --expiredate '' user
+
+# add flatpak 
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --user --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak remote-modify --collection-id=org.flathub.Stable flathub
+flatpak remote-modify --collection-id=org.flathub.Beta flathub-beta
+
+# extract flats
+flatpak create-usb ./flats $(flatpak list --app --columns application:f) --allow-partial
+flatpak list --app --columns application:f > flats.txt
+
+# if an app dont export do one of these: exclude app - update app - uninstall then install
+# for me most apps this problem doesnt resolve
