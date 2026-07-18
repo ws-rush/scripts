@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: Rushied Qaied Alwusbay
-# Email: rush@wusaby.me
+# Email: rush@wusaby.com
 # Version: 0.08
 # Script use to Create a clone of your apllications and data
 
