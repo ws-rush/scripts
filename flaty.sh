@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: Rushied Qaied Alwusbay
-# Email: rush@wusaby.me
+# Email: rush@wusaby.com
 # Version: 0.02
 # Script use to Create a clone of flatpak or write clone to system
 
