@@ -65,7 +65,7 @@ if [[ " ${optionsArray[*]} " =~ " --net " ]]; then
     # Recursively unmount the bind mounts
     umount -R "$ROOT/proc"
     
-    for d in run sys dev; do sudo umount -R "$ROOT/$d"; done
+    for d in run sys dev; do umount -R "$ROOT/$d"; done
 
     # Restore the original resolv.conf
     if [ -f "$ROOT/etc/resolv.conf.bak" ]; then
