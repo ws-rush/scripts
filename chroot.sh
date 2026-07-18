@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # author: Rushied Q. Alwusaby
-# email: rush@wusaby.me
+# email: rush@wusaby.com
 
 if [ "$#" -eq 0 ]; then
   optionsArray=( --help )
@@ -9,29 +9,75 @@ else
   optionsArray=( "$@" )
 fi
 
-# check if
+# check if help is requested
 if [[ " ${optionsArray[*]} " =~ " --help " ]]; then
-    echo "usage like: chroot.sh --help"
-    echo "usage like: chroot.sh /dev/sda1"
-    echo "usage like: chroot.sh /dev/sda1 --net"
-    exit
+    echo "usage like: $0 --help"
+    echo "usage like: $0 /dev/sda1"
+    echo "usage like: $0 /dev/sda1 --net"
+    echo "usage like: $0 /path/to/directory --net"
+    exit 0
 fi
 
-DIR=/xxx
-DISK=$1
+TARGET=$1
 
-umount $DISK;
-mkdir $DIR;
-mount $DISK $DIR;
+# 1. Detect if TARGET is a Block Device or a Directory
+if [ -b "$TARGET" ]; then
+    # It's a disk/partition
+    ROOT=/xxx
+    umount "$TARGET" 2>/dev/null # Ignore error if not mounted
+    mkdir -p "$ROOT"
+    mount "$TARGET" "$ROOT"
+    IS_DISK=true
+elif [ -d "$TARGET" ]; then
+    # It's already a directory
+    ROOT="$TARGET"
+    IS_DISK=false
+else
+    echo "Error: '$TARGET' is neither a valid disk device nor a directory."
+    exit 1
+fi
+
+# 2. Mount system directories if --net is requested
+if [[ " ${optionsArray[*]} " =~ " --net " ]]; then
+    mount -t proc proc "$ROOT/proc"
+
+    for d in dev sys run; do
+      mount --rbind "/$d" "$ROOT/$d"
+      mount --make-rslave "$ROOT/$d"
+    done
+
+    # Backup resolv.conf just in case
+    if [ -f "$ROOT/etc/resolv.conf" ]; then
+        mv "$ROOT/etc/resolv.conf" "$ROOT/etc/resolv.conf.bak"
+    fi
+    
+    rm -f "$ROOT/etc/resolv.conf"
+    cp -L /etc/resolv.conf "$ROOT/etc/resolv.conf"
+fi
+
+# 3. Enter the chroot environment
+chroot "$ROOT" /bin/bash
+
+# 4. CLEANUP (Happens after you type 'exit' inside the chroot)
+echo "Exiting chroot. Cleaning up mounts..."
 
 if [[ " ${optionsArray[*]} " =~ " --net " ]]; then
-    mount -t proc proc $DIR/proc
-    mount -t sysfs sys $DIR/sys
-    mount -o bind /dev $DIR/dev
-    mount -t devpts pts $DIR/dev/pts/
-    mount -o bind /run $DIR/run
-    cp /etc/resolv.conf $DIR/etc/resolv.conf
+    # Recursively unmount the bind mounts
+    umount -R "$ROOT/dev" 2>/dev/null
+    umount -R "$ROOT/sys" 2>/dev/null
+    umount -R "$ROOT/run" 2>/dev/null
+    umount "$ROOT/proc" 2>/dev/null
+
+    # Restore the original resolv.conf
+    if [ -f "$ROOT/etc/resolv.conf.bak" ]; then
+        mv "$ROOT/etc/resolv.conf.bak" "$ROOT/etc/resolv.conf"
+    fi
 fi
 
-chroot $DIR /bin/bash
-rmdir $DIR
+# Only unmount and delete /xxx if we originally mounted a disk
+if [ "$IS_DISK" = true ]; then
+    umount "$ROOT"
+    rmdir "$ROOT"
+fi
+
+echo "Done."
