@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: Rushied Qaied Alwusbay
-# Email: rush@wusaby.me
+# Email: rush@wusaby.com
 # Version: 0.9
 # add or change swap in file
 
