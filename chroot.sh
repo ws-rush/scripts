@@ -63,10 +63,9 @@ echo "Exiting chroot. Cleaning up mounts..."
 
 if [[ " ${optionsArray[*]} " =~ " --net " ]]; then
     # Recursively unmount the bind mounts
-    umount -R "$ROOT/dev" 2>/dev/null
-    umount -R "$ROOT/sys" 2>/dev/null
-    umount -R "$ROOT/run" 2>/dev/null
-    umount "$ROOT/proc" 2>/dev/null
+    umount -R "$ROOT/proc"
+    
+    for d in run sys dev; do sudo umount -R "$ROOT/$d"; done
 
     # Restore the original resolv.conf
     if [ -f "$ROOT/etc/resolv.conf.bak" ]; then
